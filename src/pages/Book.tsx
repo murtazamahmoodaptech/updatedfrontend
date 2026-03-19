@@ -13,6 +13,7 @@ import { toast } from "sonner";
 import PageHero from "@/components/PageHero";
 import { TIME_SLOTS } from "@/data/pricing";
 import { useCart } from "@/contexts/CartContext";
+import { API_ENDPOINTS } from "@/config/api";
 import heroBook from "@/assets/hero-book.jpg";
 
 interface Coupon {
@@ -47,8 +48,6 @@ export default function BookPage() {
    });
    const [date, setDate] = useState<Date>();
 
-    const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || "https://gisserver.vercel.app/api";
-
   // Check for stored coupon from popup on mount
   useEffect(() => {
     const storedCode = localStorage.getItem("discount_code");
@@ -81,7 +80,7 @@ export default function BookPage() {
     }
 
     try {
-      const response = await fetch(`${API_BASE_URL}/coupons?active=true`);
+      const response = await fetch(API_ENDPOINTS.COUPONS.LIST_ACTIVE);
       const data = await response.json();
       
       if (data.success && Array.isArray(data.data)) {

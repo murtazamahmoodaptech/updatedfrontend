@@ -59,7 +59,7 @@ const howItWorks = [
 const additionalBenefits = [
   { icon: Droplets, title: "Water-Saving Tech", desc: "Our methods use up to 80% less water than traditional car washes while delivering superior results.", image: wheelDetailingImg },
   { icon: Gem, title: "Ceramic Protection", desc: "Long-lasting ceramic coatings that protect your paint from UV rays, bird droppings, and road contaminants.", image: ceramicImg },
-  { icon: Wrench, title: "Paint Correction", desc: "Advanced machine polishing removes swirl marks, scratches, and oxidation to restore factory finish.", image: paintProtectionImg },
+  // { icon: Wrench, title: "Paint Correction", desc: "Advanced machine polishing removes swirl marks, scratches, and oxidation to restore factory finish.", image: paintProtectionImg },
   { icon: ThumbsUp, title: "Mobile Service", desc: "Can't come to us? We come to you. Our fully equipped mobile units serve your home or office.", image: leatherCareImg },
 ];
 
@@ -325,7 +325,7 @@ const validateCoupon = async () => {
       <section className="py-16 lg:py-24 bg-gradient-card">
         <div className="container mx-auto px-4 lg:px-8">
           <SectionHeading subtitle="More Reasons" title="Beyond the Basics" description="We don't just clean cars — we restore, protect, and elevate your vehicle." />
-          <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6 mt-12 lg:mt-16">
+          <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6 mt-12 lg:mt-16">
             {additionalBenefits.map((item, i) => (
               <motion.div key={item.title} initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ delay: i * 0.1 }} whileHover={{ y: -5 }} className="bg-secondary/30 border border-border rounded-xl card-hover shine-hover overflow-hidden group">
                 <div className="h-40 overflow-hidden">

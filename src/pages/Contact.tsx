@@ -8,6 +8,7 @@ import { Label } from "@/components/ui/label";
 import { toast } from "sonner";
 import SectionHeading from "@/components/SectionHeading";
 import PageHero from "@/components/PageHero";
+import { API_ENDPOINTS } from "@/config/api";
 import heroContact from "@/assets/hero-contact.jpg";
 
 const contactInfo = [
@@ -40,7 +41,7 @@ export default function ContactPage() {
 
     setIsLoading(true);
     try {
-      const response = await fetch(`https://gisserver.vercel.app/api/contact`, {
+      const response = await fetch(API_ENDPOINTS.CONTACT.CREATE, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({

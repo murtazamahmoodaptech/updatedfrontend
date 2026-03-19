@@ -61,6 +61,9 @@ interface Feedback {
   title: string;
   feedback: string;
   status: 'pending' | 'draft' | 'publish';
+  source?: 'manual' | 'facebook';
+  profileUrl?: string;
+  externalId?: string;
   createdAt: string;
   updatedAt: string;
 }
@@ -124,6 +127,9 @@ export default function AdminDashboard() {
   const [feedbacksLoading, setFeedbacksLoading] = useState(false);
   const [feedbackSearch, setFeedbackSearch] = useState("");
   const [feedbackStatusFilter, setFeedbackStatusFilter] = useState("all");
+  const [feedbackSourceFilter, setFeedbackSourceFilter] = useState("all");
+  const [isSyncingFB, setIsSyncingFB] = useState(false);
+  const [syncError, setSyncError] = useState("");
   const [editingFeedback, setEditingFeedback] = useState<Feedback | null>(null);
   const [editFeedbackStatus, setEditFeedbackStatus] = useState("");
   const [selectedFeedback, setSelectedFeedback] = useState<Feedback | null>(null);
@@ -626,7 +632,38 @@ export default function AdminDashboard() {
       setFeedbacksLoading(false);
     }
   };
-
+  const handleSyncFacebook = async () => {
+  setIsSyncingFB(true);
+  setSyncError("");
+  
+  try {
+  const res = await fetch('https://gisserver.vercel.app/api/feedback/sync-facebook', {
+  method: 'POST',
+  headers: {
+  Authorization: `Bearer ${token}`,
+  'Content-Type': 'application/json',
+  },
+  });
+  
+  const data = await res.json();
+  
+  if (res.ok && data.success) {
+  toast.success(`Synced ${data.data.inserted} Facebook reviews`);
+  fetchFeedbacks(); // refresh list
+  } else {
+  const errorMsg = data.message || 'Sync failed. Check your Facebook credentials.';
+  setSyncError(errorMsg);
+  toast.error(errorMsg);
+  }
+  } catch (err) {
+  const errorMsg = err instanceof Error ? err.message : 'Network error syncing Facebook reviews';
+  setSyncError(errorMsg);
+  console.error("[v0] FB sync error:", err);
+  toast.error(errorMsg);
+  } finally {
+  setIsSyncingFB(false);
+  }
+  };
   const handleUpdateFeedbackStatus = async (feedbackId: string, newStatus: string) => {
     try {
       const response = await fetch(`https://gisserver.vercel.app/api/feedback?id=${feedbackId}`, {
@@ -902,7 +939,8 @@ export default function AdminDashboard() {
 
           {/* Reviews Tab */}
           <TabsContent value="reviews">
-            <div className="flex flex-col md:flex-row gap-4 mb-6">
+            {/* <div className="flex flex-col md:flex-row gap-4 mb-6">
+              
               <div className="relative flex-1">
                 <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
                 <Input value={feedbackSearch} onChange={(e) => setFeedbackSearch(e.target.value)} placeholder="Search by name or email..." className="bg-secondary border-border text-foreground pl-10" />
@@ -915,9 +953,62 @@ export default function AdminDashboard() {
                   {["all", "pending", "draft", "publish"].map((s) => <SelectItem key={s} value={s}>{s === "all" ? "All Status" : s.charAt(0).toUpperCase() + s.slice(1)}</SelectItem>)}
                 </SelectContent>
               </Select>
-            </div>
+            </div> */}
+<div className="flex flex-col md:flex-row gap-4 mb-6 items-center">
+  
+  <div className="relative flex-1">
+    <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+    <Input
+      value={feedbackSearch}
+      onChange={(e) => setFeedbackSearch(e.target.value)}
+      placeholder="Search by name or email..."
+      className="bg-secondary border-border text-foreground pl-10"
+    />
+  </div>
 
-            <div className="bg-gradient-card border border-border rounded-xl overflow-hidden">
+  <Select value={feedbackStatusFilter} onValueChange={setFeedbackStatusFilter}>
+  <SelectTrigger className="w-full md:w-48 bg-secondary border-border text-foreground">
+  <Filter className="w-4 h-4 mr-2" />
+  <SelectValue />
+  </SelectTrigger>
+  <SelectContent className="bg-card border-border">
+  {["all", "pending", "draft", "publish"].map((s) => (
+  <SelectItem key={s} value={s}>
+  {s === "all" ? "All Status" : s.charAt(0).toUpperCase() + s.slice(1)}
+  </SelectItem>
+  ))}
+  </SelectContent>
+  </Select>
+
+  <Select value={feedbackSourceFilter} onValueChange={setFeedbackSourceFilter}>
+  <SelectTrigger className="w-full md:w-48 bg-secondary border-border text-foreground">
+  <Filter className="w-4 h-4 mr-2" />
+  <SelectValue />
+  </SelectTrigger>
+  <SelectContent className="bg-card border-border">
+  <SelectItem value="all">All Sources</SelectItem>
+  <SelectItem value="manual">Manual</SelectItem>
+  <SelectItem value="facebook">Facebook</SelectItem>
+  </SelectContent>
+  </Select>
+  
+  <Button 
+    onClick={handleSyncFacebook} 
+    disabled={isSyncingFB}
+    className="bg-blue-600 text-white hover:bg-blue-700 disabled:opacity-50"
+  >
+    {isSyncingFB ? "Syncing..." : "Sync Facebook"}
+  </Button>
+  </div>
+  
+  {syncError && (
+  <div className="bg-red-500/10 border border-red-500/30 rounded-lg p-3 text-sm text-red-400 mb-6">
+    <p className="font-medium">Sync Error:</p>
+    <p>{syncError}</p>
+  </div>
+  )}
+  
+  <div className="bg-gradient-card border border-border rounded-xl overflow-hidden">
               <div className="overflow-x-auto">
                 <table className="w-full text-sm">
                   <thead>
@@ -932,17 +1023,34 @@ export default function AdminDashboard() {
                       <tr><td colSpan={7} className="text-center py-12 text-muted-foreground">Loading feedbacks...</td></tr>
                     ) : feedbacks.length === 0 ? (
                       <tr><td colSpan={7} className="text-center py-12 text-muted-foreground">No feedbacks found.</td></tr>
-                    ) : feedbacks.filter(f => (feedbackStatusFilter === "all" || f.status === feedbackStatusFilter) && (feedbackSearch === "" || f.name.toLowerCase().includes(feedbackSearch.toLowerCase()) || f.email.toLowerCase().includes(feedbackSearch.toLowerCase()))).map((feedback) => (
+                    ) : feedbacks.filter(f => 
+  (feedbackStatusFilter === "all" || f.status === feedbackStatusFilter) && 
+  (feedbackSourceFilter === "all" || f.source === feedbackSourceFilter) && 
+  (feedbackSearch === "" || f.name.toLowerCase().includes(feedbackSearch.toLowerCase()) || f.email.toLowerCase().includes(feedbackSearch.toLowerCase()))
+).map((feedback) => (
                       <tr key={feedback._id} className="border-b border-border/50 hover:bg-secondary/30 transition-colors">
-                        <td className="px-4 py-3"><div className="text-foreground font-medium">{feedback.name}</div></td>
-                        <td className="px-4 py-3"><div className="text-foreground text-sm">{feedback.email}</div></td>
-                        <td className="px-4 py-3">
-                          <div className="flex gap-0.5">
-                            {Array.from({ length: 5 }).map((_, i) => (
-                              <Star key={i} className={`w-3 h-3 ${i < feedback.rating ? "fill-primary text-primary" : "text-muted-foreground/30"}`} />
-                            ))}
-                          </div>
-                        </td>
+  <td className="px-4 py-3">
+  <div className="flex items-center gap-2">
+  {feedback.source === 'facebook' && feedback.profileUrl ? (
+  <a 
+    href={feedback.profileUrl} 
+    target="_blank" 
+    rel="noopener noreferrer"
+    className="text-foreground font-medium hover:text-blue-500 underline"
+  >
+    {feedback.name}
+  </a>
+  ) : (
+  <span className="text-foreground font-medium">{feedback.name}</span>
+  )}
+  
+  {feedback.source === 'facebook' && (
+  <span className="text-xs bg-blue-500 text-white px-2 py-0.5 rounded">
+  Facebook
+  </span>
+  )}
+  </div>
+  </td>
                         <td className="px-4 py-3 text-foreground text-sm max-w-xs truncate">{feedback.title}</td>
                         <td className="px-4 py-3">
                           <Badge variant="outline" className={`text-xs ${feedback.status === 'pending' ? 'bg-yellow-500/20 text-yellow-400 border-yellow-500/30' : feedback.status === 'draft' ? 'bg-blue-500/20 text-blue-400 border-blue-500/30' : 'bg-emerald-500/20 text-emerald-400 border-emerald-500/30'}`}>
