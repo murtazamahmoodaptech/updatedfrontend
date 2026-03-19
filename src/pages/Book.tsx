@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
-import { CalendarIcon, Car, Trash2, ShoppingCart, CheckCircle, AlertCircle, X, Check, Tag } from "lucide-react";
+import { CalendarIcon, Car, Trash2, ShoppingCart, CheckCircle, AlertCircle, X, Check, Tag, Clock } from "lucide-react";
 import { format } from "date-fns";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -13,7 +13,7 @@ import { toast } from "sonner";
 import PageHero from "@/components/PageHero";
 import { TIME_SLOTS } from "@/data/pricing";
 import { useCart } from "@/contexts/CartContext";
-import { API_ENDPOINTS } from "@/config/api";
+import { API_ENDPOINTS, API_BASE_URL } from "@/config/api";
 import heroBook from "@/assets/hero-book.jpg";
 
 interface Coupon {
@@ -243,38 +243,92 @@ export default function BookPage() {
             <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.3 }} className="bg-gradient-card border border-border rounded-xl p-6 lg:p-8 space-y-4 card-hover">
               <h3 className="font-display text-xl font-bold text-foreground flex items-center gap-2"><Car className="w-5 h-5 text-primary" /> Vehicle Information</h3>
               <div className="grid md:grid-cols-2 gap-4">
-                <div><Label className="text-foreground">Vehicle Name</Label><Input value={form.vehicleName} onChange={(e) => update("vehicleName", e.target.value)} placeholder="e.g. Tesla vehicleModel 3" className="bg-secondary border-border text-foreground mt-1" /></div>
+                <div><Label className="text-foreground">Vehicle Name</Label><Input value={form.vehicleName} onChange={(e) => update("vehicleName", e.target.value)} placeholder="e.g. Tesla Model 3" className="bg-secondary border-border text-foreground mt-1" /></div>
                 <div><Label className="text-foreground">Make</Label><Input value={form.make} onChange={(e) => update("make", e.target.value)} placeholder="e.g. Tesla" className="bg-secondary border-border text-foreground mt-1" /></div>
                 <div><Label className="text-foreground">Model</Label><Input value={form.vehicleModel} onChange={(e) => update("vehicleModel", e.target.value)} placeholder="e.g. Model 3" className="bg-secondary border-border text-foreground mt-1" /></div>
-                <div><Label className="text-foreground">Year</Label><Input value={form.year} onChange={(e) => update("year", e.target.value)} placeholder="e.g. 2024" className="bg-secondary border-border text-foreground mt-1" /></div>
+                <div>
+                  <Label className="text-foreground">Year</Label>
+                  <Select value={form.year} onValueChange={(v) => update("year", v)}>
+                    <SelectTrigger className="bg-secondary border-border text-foreground mt-1">
+                      <SelectValue placeholder="Select year" />
+                    </SelectTrigger>
+                    <SelectContent className="bg-card border-border max-h-60">
+                      {Array.from({ length: 35 }, (_, i) => new Date().getFullYear() + 1 - i).map((year) => (
+                        <SelectItem key={year} value={year.toString()}>{year}</SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
               </div>
             </motion.div>
 
             {/* Scheduling */}
-            <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.4 }} className="bg-gradient-card border border-border rounded-xl p-6 lg:p-8 space-y-4 card-hover">
-              <h3 className="font-display text-xl font-bold text-foreground">Scheduling</h3>
-              <div className="grid md:grid-cols-2 gap-4">
-                <div>
-                  <Label className="text-foreground">Date *</Label>
+            <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.4 }} className="bg-gradient-card border border-primary/30 rounded-xl p-6 lg:p-8 space-y-5 card-hover">
+              <h3 className="font-display text-xl font-bold text-foreground flex items-center gap-2">
+                <CalendarIcon className="w-5 h-5 text-primary" /> Schedule Your Appointment
+              </h3>
+              <div className="grid md:grid-cols-2 gap-6">
+                <div className="space-y-2">
+                  <Label className="text-foreground font-medium flex items-center gap-2">
+                    <span className="w-6 h-6 rounded-full bg-primary/20 flex items-center justify-center text-xs text-primary font-bold">1</span>
+                    Select Date *
+                  </Label>
                   <Popover>
                     <PopoverTrigger asChild>
-                      <Button variant="outline" className={cn("w-full justify-start text-left font-normal bg-secondary border-border mt-1", !date && "text-muted-foreground")}>
-                        <CalendarIcon className="mr-2 h-4 w-4" />{date ? format(date, "PPP") : "Pick a date"}
+                      <Button 
+                        variant="outline" 
+                        className={cn(
+                          "w-full justify-start text-left font-medium bg-secondary/50 border-primary/30 hover:border-primary/50 hover:bg-primary/10 transition-all duration-200 h-12",
+                          !date && "text-muted-foreground",
+                          date && "border-primary/50 bg-primary/10 text-foreground"
+                        )}
+                      >
+                        <CalendarIcon className={cn("mr-3 h-5 w-5", date ? "text-primary" : "text-muted-foreground")} />
+                        {date ? format(date, "EEEE, MMMM d, yyyy") : "Choose your preferred date"}
                       </Button>
                     </PopoverTrigger>
-                    <PopoverContent className="w-auto p-0 bg-card border-border" align="start">
-                      <Calendar mode="single" selected={date} onSelect={setDate} disabled={(d) => d < new Date()} initialFocus className="p-3 pointer-events-auto" />
+                    <PopoverContent className="w-auto p-0 bg-card border-primary/30 shadow-xl shadow-primary/10" align="start">
+                      <Calendar mode="single" selected={date} onSelect={setDate} disabled={(d) => d < new Date()} initialFocus className="pointer-events-auto" />
                     </PopoverContent>
                   </Popover>
                 </div>
-                <div>
-                  <Label className="text-foreground">Time Slot *</Label>
+                <div className="space-y-2">
+                  <Label className="text-foreground font-medium flex items-center gap-2">
+                    <span className="w-6 h-6 rounded-full bg-primary/20 flex items-center justify-center text-xs text-primary font-bold">2</span>
+                    Select Time *
+                  </Label>
                   <Select value={form.timeSlot} onValueChange={(v) => update("timeSlot", v)}>
-                    <SelectTrigger className="bg-secondary border-border text-foreground mt-1"><SelectValue placeholder="Select time" /></SelectTrigger>
-                    <SelectContent className="bg-card border-border">{TIME_SLOTS.map((t) => <SelectItem key={t} value={t}>{t}</SelectItem>)}</SelectContent>
+                    <SelectTrigger className={cn(
+                      "bg-secondary/50 border-primary/30 hover:border-primary/50 text-foreground h-12 transition-all duration-200",
+                      form.timeSlot && "border-primary/50 bg-primary/10"
+                    )}>
+                      <div className="flex items-center">
+                        <Clock className={cn("mr-3 h-5 w-5", form.timeSlot ? "text-primary" : "text-muted-foreground")} />
+                        <SelectValue placeholder="Choose your preferred time" />
+                      </div>
+                    </SelectTrigger>
+                    <SelectContent className="bg-card border-primary/30 shadow-xl shadow-primary/10">
+                      {TIME_SLOTS.map((t) => (
+                        <SelectItem key={t} value={t} className="hover:bg-primary/10 focus:bg-primary/10 cursor-pointer">
+                          <span className="font-medium">{t}</span>
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
                   </Select>
                 </div>
               </div>
+              {date && form.timeSlot && (
+                <motion.div 
+                  initial={{ opacity: 0, y: 10 }} 
+                  animate={{ opacity: 1, y: 0 }} 
+                  className="flex items-center gap-3 p-4 rounded-lg bg-primary/10 border border-primary/30"
+                >
+                  <CheckCircle className="w-5 h-5 text-primary flex-shrink-0" />
+                  <p className="text-sm text-foreground">
+                    <span className="font-semibold text-primary">Appointment:</span> {format(date, "EEEE, MMMM d")} at {form.timeSlot}
+                  </p>
+                </motion.div>
+              )}
             </motion.div>
 
             {/* Promo & Pricing */}

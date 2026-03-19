@@ -12,9 +12,9 @@ import { API_ENDPOINTS } from "@/config/api";
 import heroContact from "@/assets/hero-contact.jpg";
 
 const contactInfo = [
-  { icon: Phone, label: "Phone", value: "(555) 123-4567", href: "tel:+15551234567" },
-  { icon: Mail, label: "Email", value: "support@globalintegratedsupport.com", href: "mailto:support@globalintegratedsupport.com" },
-  { icon: MapPin, label: "Address", value: "123 Detail Lane, Auto City, AC 12345" },
+  { icon: Phone, label: "Phone", value: "(555) 123-4567", href: "tel:+15551234567", actionLabel: "Call us" },
+  { icon: Mail, label: "Email", value: "support@globalintegratedsupport.com", href: "mailto:support@globalintegratedsupport.com", actionLabel: "Send email" },
+  { icon: MapPin, label: "Address", value: "123 Detail Lane, Auto City, AC 12345", href: "https://maps.google.com/?q=123+Detail+Lane+Auto+City", actionLabel: "Get directions" },
   { icon: Clock, label: "Hours", value: "Mon-Sat: 8AM - 6PM" },
 ];
 
@@ -88,16 +88,23 @@ export default function ContactPage() {
               <p className="text-muted-foreground leading-relaxed">Whether you have a question about our services, need a custom quote, or just want to say hello — we're here to help.</p>
               <div className="grid sm:grid-cols-2 lg:grid-cols-1 gap-4">
                 {contactInfo.map((item, i) => (
-                  <motion.div key={item.label} initial={{ opacity: 0, y: 15 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ delay: i * 0.1 }} whileHover={{ x: 5 }} className="flex items-start gap-4 p-4 bg-gradient-card border border-border rounded-xl card-hover shine-hover">
-                    <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center flex-shrink-0">
-                      <item.icon className="w-4 h-4 text-primary" />
+                  <motion.div key={item.label} initial={{ opacity: 0, y: 15 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ delay: i * 0.1 }} whileHover={{ x: 5 }} className="flex items-start gap-4 p-5 bg-gradient-card border border-border rounded-xl card-hover shine-hover">
+                    <div className="w-12 h-12 rounded-xl bg-primary/10 border border-primary/30 flex items-center justify-center flex-shrink-0">
+                      <item.icon className="w-5 h-5 text-primary" />
                     </div>
-                    <div>
-                      <div className="text-xs text-muted-foreground uppercase tracking-wider">{item.label}</div>
+                    <div className="flex-1">
+                      <div className="text-xs text-muted-foreground uppercase tracking-wider font-medium mb-1">{item.label}</div>
                       {item.href ? (
-                        <a href={item.href} className="text-foreground hover:text-primary transition-colors text-sm text-hover-glow">{item.value}</a>
+                        <a 
+                          href={item.href} 
+                          target={item.href.startsWith('http') ? '_blank' : undefined}
+                          rel={item.href.startsWith('http') ? 'noopener noreferrer' : undefined}
+                          className="text-foreground hover:text-primary transition-colors text-sm font-medium text-hover-glow block"
+                        >
+                          {item.value}
+                        </a>
                       ) : (
-                        <span className="text-foreground text-sm">{item.value}</span>
+                        <span className="text-foreground text-sm font-medium">{item.value}</span>
                       )}
                     </div>
                   </motion.div>
