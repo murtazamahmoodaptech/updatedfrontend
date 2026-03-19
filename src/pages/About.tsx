@@ -5,18 +5,24 @@ import { Button } from "@/components/ui/button";
 import SectionHeading from "@/components/SectionHeading";
 import PageHero from "@/components/PageHero";
 import heroAbout from "@/assets/hero-about.jpg";
-import ceramicImg from "@/assets/detail-ceramic-coating.jpg";
-import paintProtectionImg from "@/assets/detail-paint-protection.jpg";
-import leatherCareImg from "@/assets/detail-leather-care.jpg";
-import wheelDetailingImg from "@/assets/detail-wheel-detailing.jpg";
-import engineBayImg from "@/assets/detail-engine-bay.jpg";
-import beforeAfterImg from "@/assets/detail-before-after.jpg";
+
+// Values section images - unique for each value
+const qualityProductsImg = "/images/quality-products.jpg";
+const customerServiceImg = "/images/customer-service.jpg";
+const certifiedTeamImg = "/images/certified-team.jpg";
+const passionDetailImg = "/images/passion-detail.jpg";
+
+// Why Us section images - unique for each item
+const ceramicCoatingImg = "/images/ceramic-coating.jpg";
+const onTimeServiceImg = "/images/on-time-service.jpg";
+const ecoFriendlyImg = "/images/eco-friendly-wash.jpg";
+const satisfactionImg = "/images/satisfaction-guarantee.jpg";
 
 const values = [
-  { icon: Shield, title: "Quality First", desc: "We never cut corners. Every detail matters, from the products we use to the techniques we employ. Excellence is our standard.", image: ceramicImg },
-  { icon: Users, title: "Customer Focus", desc: "Your satisfaction is our priority. We tailor every service to meet your specific needs and expectations, every single time.", image: leatherCareImg },
-  { icon: Award, title: "Excellence", desc: "Our team is certified and continuously trained in the latest detailing techniques, tools, and technologies.", image: engineBayImg },
-  { icon: Heart, title: "Passion", desc: "We genuinely love what we do. That passion shows in every vehicle we touch and every customer interaction we have.", image: beforeAfterImg },
+  { icon: Shield, title: "Quality First", desc: "We never cut corners. Every detail matters, from the products we use to the techniques we employ. Excellence is our standard.", image: qualityProductsImg },
+  { icon: Users, title: "Customer Focus", desc: "Your satisfaction is our priority. We tailor every service to meet your specific needs and expectations, every single time.", image: customerServiceImg },
+  { icon: Award, title: "Excellence", desc: "Our team is certified and continuously trained in the latest detailing techniques, tools, and technologies.", image: certifiedTeamImg },
+  { icon: Heart, title: "Passion", desc: "We genuinely love what we do. That passion shows in every vehicle we touch and every customer interaction we have.", image: passionDetailImg },
 ];
 
 const process = [
@@ -27,10 +33,10 @@ const process = [
 ];
 
 const whyUs = [
-  { icon: Sparkles, title: "Premium Products", desc: "We exclusively use professional-grade, pH-balanced products safe for all vehicle finishes and interiors.", image: paintProtectionImg },
-  { icon: Clock, title: "On-Time Service", desc: "We respect your schedule. Appointments start and finish on time, every time. No surprises, no delays.", image: wheelDetailingImg },
-  { icon: Leaf, title: "Eco-Friendly", desc: "Our waterless and low-water techniques conserve up to 100 gallons per wash compared to traditional methods.", image: beforeAfterImg },
-  { icon: CheckCircle, title: "Satisfaction Guarantee", desc: "Not happy with the results? We'll re-do the service at no extra charge. Your satisfaction is non-negotiable.", image: ceramicImg },
+  { icon: Sparkles, title: "Premium Products", desc: "We exclusively use professional-grade, pH-balanced products safe for all vehicle finishes and interiors.", image: ceramicCoatingImg },
+  { icon: Clock, title: "On-Time Service", desc: "We respect your schedule. Appointments start and finish on time, every time. No surprises, no delays.", image: onTimeServiceImg },
+  { icon: Leaf, title: "Eco-Friendly", desc: "Our waterless and low-water techniques conserve up to 100 gallons per wash compared to traditional methods.", image: ecoFriendlyImg },
+  { icon: CheckCircle, title: "Satisfaction Guarantee", desc: "Not happy with the results? We'll re-do the service at no extra charge. Your satisfaction is non-negotiable.", image: satisfactionImg },
 ];
 
 const milestones = [

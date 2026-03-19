@@ -122,28 +122,63 @@ export default function ServicesPage() {
                 <button onClick={() => setSelectedService(null)} className="flex items-center gap-2 text-muted-foreground hover:text-primary mb-6 transition-colors text-hover-glow">
                   <ArrowLeft className="w-4 h-4" /> Back to Services
                 </button>
-                <h3 className="font-display text-xl sm:text-2xl font-bold text-foreground mb-2 text-center">
-                  <span className="text-gradient-sky">{selectedService}</span> for {selectedBrand}
-                </h3>
-                <p className="text-muted-foreground text-center mb-8 text-sm sm:text-base">Select your vehicle category to see pricing</p>
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 max-w-4xl mx-auto">
+                <div className="text-center mb-10">
+                  <h3 className="font-display text-xl sm:text-2xl font-bold text-foreground mb-2">
+                    <span className="text-gradient-sky">{selectedService}</span> for {selectedBrand}
+                  </h3>
+                  <p className="text-muted-foreground text-sm sm:text-base">Select your vehicle category to see pricing</p>
+                </div>
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-5 max-w-6xl mx-auto">
                   {VEHICLE_CATEGORIES.map((cat, i) => {
                     const Icon = CATEGORY_ICONS[cat] || Car;
                     const price = getPrice(selectedService, cat);
+                    const isPopular = cat === "SUV";
                     return (
-                      <motion.div key={cat} initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.08 }} whileHover={{ y: -5, scale: 1.02 }} className="bg-gradient-card border border-border rounded-xl p-5 sm:p-6 card-hover shine-hover transition-all duration-300">
-                        <div className="flex items-center gap-3 mb-4">
-                          <div className="w-12 h-12 rounded-full bg-primary/10 border border-primary/30 flex items-center justify-center">
-                            <Icon className="w-6 h-6 text-primary" />
+                      <motion.div 
+                        key={cat} 
+                        initial={{ opacity: 0, y: 20 }} 
+                        animate={{ opacity: 1, y: 0 }} 
+                        transition={{ delay: i * 0.08 }} 
+                        whileHover={{ y: -8, scale: 1.03 }} 
+                        className={`relative bg-gradient-card rounded-2xl overflow-hidden card-hover shine-hover transition-all duration-300 ${isPopular ? 'border-2 border-primary shadow-sky' : 'border border-border'}`}
+                      >
+                        {isPopular && (
+                          <div className="absolute top-0 left-0 right-0 bg-gradient-sky text-primary-foreground text-xs font-bold py-1.5 text-center uppercase tracking-wider">
+                            Most Popular
                           </div>
-                          <div>
-                            <h4 className="text-foreground font-semibold text-base sm:text-lg">{cat}</h4>
-                            <span className="text-primary font-bold text-lg sm:text-xl">${price?.toFixed(2)}</span>
+                        )}
+                        <div className={`p-6 ${isPopular ? 'pt-10' : ''}`}>
+                          <div className="flex flex-col items-center text-center mb-5">
+                            <div className={`w-16 h-16 rounded-2xl flex items-center justify-center mb-4 ${isPopular ? 'bg-primary/20 border-2 border-primary/50' : 'bg-primary/10 border border-primary/30'}`}>
+                              <Icon className={`w-8 h-8 ${isPopular ? 'text-primary' : 'text-primary/80'}`} />
+                            </div>
+                            <h4 className="text-foreground font-bold text-lg mb-1">{cat}</h4>
+                            <div className="flex items-baseline gap-1">
+                              <span className="text-3xl font-display font-bold text-gradient-sky">${price?.toFixed(0)}</span>
+                              <span className="text-muted-foreground text-sm">.{((price || 0) % 1).toFixed(2).substring(2)}</span>
+                            </div>
                           </div>
+                          <div className="space-y-2 mb-5">
+                            <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                              <Check className="w-4 h-4 text-primary flex-shrink-0" />
+                              <span>Full {selectedService}</span>
+                            </div>
+                            <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                              <Check className="w-4 h-4 text-primary flex-shrink-0" />
+                              <span>Premium Products</span>
+                            </div>
+                            <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                              <Check className="w-4 h-4 text-primary flex-shrink-0" />
+                              <span>Expert Service</span>
+                            </div>
+                          </div>
+                          <Button 
+                            onClick={() => handleAddToCart(selectedService, cat)} 
+                            className={`w-full font-semibold ${isPopular ? 'bg-gradient-sky text-primary-foreground btn-glow' : 'bg-secondary hover:bg-secondary/80 text-foreground border border-border'}`}
+                          >
+                            <ShoppingCart className="w-4 h-4 mr-2" /> Add to Cart
+                          </Button>
                         </div>
-                        <Button onClick={() => handleAddToCart(selectedService, cat)} className="w-full bg-gradient-sky text-primary-foreground font-semibold btn-glow hover:opacity-90">
-                          <ShoppingCart className="w-4 h-4 mr-2" /> Add to Cart
-                        </Button>
                       </motion.div>
                     );
                   })}
