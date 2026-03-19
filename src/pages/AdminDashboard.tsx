@@ -1024,40 +1024,58 @@ export default function AdminDashboard() {
                     ) : feedbacks.length === 0 ? (
                       <tr><td colSpan={7} className="text-center py-12 text-muted-foreground">No feedbacks found.</td></tr>
                     ) : feedbacks.filter(f => 
-  (feedbackStatusFilter === "all" || f.status === feedbackStatusFilter) && 
-  (feedbackSourceFilter === "all" || f.source === feedbackSourceFilter) && 
-  (feedbackSearch === "" || f.name.toLowerCase().includes(feedbackSearch.toLowerCase()) || f.email.toLowerCase().includes(feedbackSearch.toLowerCase()))
-).map((feedback) => (
+                      (feedbackStatusFilter === "all" || f.status === feedbackStatusFilter) && 
+                      (feedbackSourceFilter === "all" || f.source === feedbackSourceFilter) && 
+                      (feedbackSearch === "" || f.name.toLowerCase().includes(feedbackSearch.toLowerCase()) || f.email.toLowerCase().includes(feedbackSearch.toLowerCase()))
+                    ).map((feedback) => (
                       <tr key={feedback._id} className="border-b border-border/50 hover:bg-secondary/30 transition-colors">
-  <td className="px-4 py-3">
-  <div className="flex items-center gap-2">
-  {feedback.source === 'facebook' && feedback.profileUrl ? (
-  <a 
-    href={feedback.profileUrl} 
-    target="_blank" 
-    rel="noopener noreferrer"
-    className="text-foreground font-medium hover:text-blue-500 underline"
-  >
-    {feedback.name}
-  </a>
-  ) : (
-  <span className="text-foreground font-medium">{feedback.name}</span>
-  )}
-  
-  {feedback.source === 'facebook' && (
-  <span className="text-xs bg-blue-500 text-white px-2 py-0.5 rounded">
-  Facebook
-  </span>
-  )}
-  </div>
-  </td>
-                        <td className="px-4 py-3 text-foreground text-sm max-w-xs truncate">{feedback.title}</td>
+                        {/* NAME Column */}
+                        <td className="px-4 py-3">
+                          <div className="flex items-center gap-2">
+                            {feedback.source === 'facebook' && feedback.profileUrl ? (
+                              <a 
+                                href={feedback.profileUrl} 
+                                target="_blank" 
+                                rel="noopener noreferrer"
+                                className="text-foreground font-medium hover:text-blue-500 underline"
+                              >
+                                {feedback.name}
+                              </a>
+                            ) : (
+                              <span className="text-foreground font-medium">{feedback.name}</span>
+                            )}
+                            {feedback.source === 'facebook' && (
+                              <span className="text-xs bg-blue-500 text-white px-2 py-0.5 rounded">Facebook</span>
+                            )}
+                          </div>
+                        </td>
+                        {/* EMAIL Column */}
+                        <td className="px-4 py-3 text-muted-foreground text-sm max-w-xs truncate">{feedback.email || '-'}</td>
+                        {/* RATING Column */}
+                        <td className="px-4 py-3">
+                          <div className="flex items-center gap-1">
+                            {feedback.rating ? (
+                              <>
+                                {[...Array(5)].map((_, i) => (
+                                  <Star key={i} className={`w-3.5 h-3.5 ${i < feedback.rating ? 'text-yellow-400 fill-yellow-400' : 'text-muted-foreground/30'}`} />
+                                ))}
+                              </>
+                            ) : (
+                              <span className="text-muted-foreground text-sm">-</span>
+                            )}
+                          </div>
+                        </td>
+                        {/* TITLE Column */}
+                        <td className="px-4 py-3 text-foreground text-sm max-w-xs truncate">{feedback.title || '-'}</td>
+                        {/* STATUS Column */}
                         <td className="px-4 py-3">
                           <Badge variant="outline" className={`text-xs ${feedback.status === 'pending' ? 'bg-yellow-500/20 text-yellow-400 border-yellow-500/30' : feedback.status === 'draft' ? 'bg-blue-500/20 text-blue-400 border-blue-500/30' : 'bg-emerald-500/20 text-emerald-400 border-emerald-500/30'}`}>
                             {feedback.status.charAt(0).toUpperCase() + feedback.status.slice(1)}
                           </Badge>
                         </td>
+                        {/* DATE Column */}
                         <td className="px-4 py-3 text-muted-foreground text-sm">{new Date(feedback.createdAt).toLocaleDateString()}</td>
+                        {/* ACTIONS Column */}
                         <td className="px-4 py-3">
                           <div className="flex items-center gap-1">
                             <button onClick={() => setSelectedFeedback(feedback)} className="p-1.5 rounded hover:bg-secondary text-muted-foreground hover:text-foreground transition-colors"><Eye className="w-4 h-4" /></button>
