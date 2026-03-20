@@ -55,11 +55,6 @@
 @layer base {
   * {
     @apply border-border;
-    cursor: none;
-  }
-
-  a, button, [role="button"], input[type="submit"], select, .cursor-pointer {
-    cursor: none;
   }
 
   body {
